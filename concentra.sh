@@ -1,5 +1,39 @@
 #!/bin/bash
 
+# Verificar se Python 3 está instalado
+if ! command -v python3 &> /dev/null; then
+  echo "Python3 não encontrado. Instalando..."
+
+  if [ -f /etc/debian_version ]; then
+    sudo apt update
+    sudo apt install -y python3 python3-pip python3-venv
+  elif [ -f /etc/redhat-release ]; then
+    sudo yum install -y python3
+  else
+    echo "Distribuição Linux não suportada automaticamente. Instale o Python 3 manualmente."
+    exit 1
+  fi
+else
+  echo "✅ Python3 já está instalado."
+fi
+
+# Verificar se pip está instalado
+if ! command -v pip3 &> /dev/null; then
+  echo "pip3 não encontrado. Instalando..."
+
+  if [ -f /etc/debian_version ]; then
+    sudo apt install -y python3-pip
+  elif [ -f /etc/redhat-release ]; then
+    sudo yum install -y python3-pip
+  else
+    echo "Distribuição Linux não suportada automaticamente. Instale o pip manualmente."
+    exit 1
+  fi
+else
+  echo "✅ pip3 já está instalado."
+fi
+
+
 APP_DIR="/opt/cupons"
 PY_FILE="$APP_DIR/app.py"
 CONFIG_DIR="/c/concentra"
