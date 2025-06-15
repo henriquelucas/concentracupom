@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo apt update && sudo apt upgrade -y
+sudo apt autoremove -y
+
 # Verificar se Python 3 está instalado
 if ! command -v python3 &> /dev/null; then
   echo "Python3 não encontrado. Instalando..."
