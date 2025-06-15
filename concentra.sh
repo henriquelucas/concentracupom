@@ -182,4 +182,14 @@ CRON_JOB="*/5 * * * * $PY_PATH $PY_FILE >> $LOG_FILE 2>&1"
 # Executar pela primeira vez
 $PY_PATH "$PY_FILE"
 
+echo ""
 echo "✅ Instalação e configuração finalizadas. O script será executado a cada 5 minutos."
+
+echo ""
+echo "📦 Versão do sistema:"
+if command -v lsb_release &> /dev/null; then
+  lsb_release -a
+else
+  cat /etc/os-release
+fi
+
