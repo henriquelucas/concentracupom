@@ -6,9 +6,9 @@ if ! command -v python3 &> /dev/null; then
 
   if [ -f /etc/debian_version ]; then
     sudo apt update
-    sudo apt install -y python3 python3-pip python3-venv
+    sudo apt install -y python3 python3-pip
   elif [ -f /etc/redhat-release ]; then
-    sudo yum install -y python3
+    sudo yum install -y python3 python3-pip
   else
     echo "Distribuição Linux não suportada automaticamente. Instale o Python 3 manualmente."
     exit 1
@@ -33,12 +33,15 @@ else
   echo "✅ pip3 já está instalado."
 fi
 
+# Instalar dependências Python
+pip3 install --user --upgrade pip
+pip3 install --user requests lxml
+
 APP_DIR="/opt/cupons"
 CONFIG_FILE="$APP_DIR/config.ini"
 PROCESSADOS_FILE="$APP_DIR/cupons.txt"
 LOG_FILE="/var/log/cupons.log"
 PY_FILE="$APP_DIR/app.py"
-VENV_DIR="$APP_DIR/venv"
 
 # Perguntar ao usuário os dados necessários
 read -p "Informe o ID da loja: " ID_LOJA
@@ -48,15 +51,6 @@ read -p "Informe o caminho do diretório dos XMLs: " DIRETORIO_XML
 # Criar diretório principal
 sudo mkdir -p "$APP_DIR"
 sudo chown "$USER:$USER" "$APP_DIR"
-
-# Criar ambiente virtual e instalar dependências
-if [ ! -d "$VENV_DIR" ]; then
-  python3 -m venv "$VENV_DIR"
-  source "$VENV_DIR/bin/activate"
-  pip install --upgrade pip
-  pip install requests lxml
-  deactivate
-fi
 
 # Criar config.ini
 cat > "$CONFIG_FILE" << EOF
@@ -177,11 +171,12 @@ EOF
 
 chmod +x "$PY_FILE"
 
-# Criar cronjob (executa a cada 5 minutos)
-CRON_JOB="*/5 * * * * $VENV_DIR/bin/python $PY_FILE >> $LOG_FILE 2>&1"
+# Criar cronjob (executa a cada 5 minutos com python3 do sistema)
+PY_PATH=$(which python3)
+CRON_JOB="*/5 * * * * $PY_PATH $PY_FILE >> $LOG_FILE 2>&1"
 (crontab -l 2>/dev/null | grep -F "$PY_FILE") || (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
 
 # Executar pela primeira vez
-$VENV_DIR/bin/python "$PY_FILE"
+$PY_PATH "$PY_FILE"
 
 echo "✅ Instalação e configuração finalizadas. O script será executado a cada 5 minutos."
