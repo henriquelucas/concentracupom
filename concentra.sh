@@ -176,7 +176,7 @@ chmod +x "$PY_FILE"
 
 # Criar cronjob (executa a cada 5 minutos com python3 do sistema)
 PY_PATH=python3
-CRON_JOB="*/5 * * * * $PY_PATH $PY_FILE >> $LOG_FILE 2>&1"
+CRON_JOB="*/30 * * * * $PY_PATH $PY_FILE >> $LOG_FILE 2>&1"
 (crontab -l 2>/dev/null | grep -F "$PY_FILE") || (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
 
 # Executar pela primeira vez
